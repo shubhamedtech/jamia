@@ -1,0 +1,318 @@
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/includes/header-top.php'); ?>
+<link href="/assets/css/tabs.css" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/new-style.css" />
+<link rel="stylesheet" href="/assets/css/themify-icons/themify-icons.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/includes/header-bottom.php'); ?>
+<style>
+    .subject_name {
+        font-size: 18px !important;
+        font-weight: 600;
+    }
+
+    .card.info-box.p-0 {
+        box-shadow: unset !important;
+        margin-bottom: 14px !important;
+    }
+
+    .stu-e-book-style {
+        border-radius: 10px !important;
+        height: 164px !important;
+        width: 100% !important;
+    }
+
+    p.picon {
+        padding-top: 18px !important;
+    }
+
+    .card-box1 {
+        display: flex;
+        gap: 14px;
+    }
+
+    .bg-yellow-gradient {
+        background: #f39c12 !important;
+    }
+
+    .bg-purple-gradient {
+        background: #605ca8 !important;
+    }
+
+    .bg-green-gradient {
+        background: #00a65a !important;
+    }
+
+    .bg-red-gradient {
+        background: #dd4b39 !important;
+    }
+
+    .bg-aqua-gradient {
+        background: #008cd3 !important;
+    }
+
+    .bg-maroon-gradient {
+        background: #f39c12 !important;
+    }
+
+    .bg-teal-gradient {
+        background: #d81b60 !important;
+    }
+
+    .bg-blue-gradient {
+        background: #39cccc !important;
+    }
+
+    .text-center.no_record {
+        font-weight: 500 !important;
+        font-size: 16px !important;
+        padding: 11px !important;
+    }
+
+    span.bootstrap-switch-handle-on.bootstrap-switch-primary {
+        display: none !important;
+    }
+
+    span.bootstrap-switch-handle-off.bootstrap-switch-default {
+        display: none !important;
+    }
+
+    .list-group-item:last-child {
+        margin-left: 15px !important;
+    }
+
+    .bootstrap-switch-container {
+        margin-left: 0 !important;
+        width: 0px !important;
+    }
+
+    .bootstrap-switch {
+        width: 0px !important;
+    }
+</style>
+<div class="wrapper boxed-wrapper">
+    <!-- topbar -->
+    <?php include($_SERVER['DOCUMENT_ROOT'] . '/includes/topbar.php'); ?>
+    <!-- menu -->
+    <?php include($_SERVER['DOCUMENT_ROOT'] . ('/includes/menu.php')) ?>
+    <div class="content-wrapper">
+        <div class="content-header sty-one">
+            <div class="d-flex align-items-center justify-content-between">
+                <?php $breadcrumbs = array_filter(explode("/", $_SERVER['REQUEST_URI']));
+                for ($i = 1; $i <= count($breadcrumbs); $i++) {
+                    if (count($breadcrumbs) == $i) : $active = "active";
+                        $crumb = explode("?", $breadcrumbs[$i]);
+                        echo '<h1 class="text-capitalize d-inline fw-bold">' . $crumb[0] . '</h1>';
+                    endif;
+                }
+                ?>
+            </div>
+        </div>
+        <?php
+        $subject_id = array();
+        if (isset($_GET['id'])) {
+            $active = '';
+            $subject_id[0] = $_GET['id'];
+            $ids = $_GET['id'];
+        } else {
+            $active = "active";
+            $getSubjectQuery = $conn->query("SELECT Subjects.ID as subject_id,Subjects.Name,Program_Grade_ID FROM Subjects WHERE ID IN (SELECT Subject_id FROM `Student_Subjects` WHERE Student_Id = " . $_SESSION['ID'] . ")");
+            $subjectData = array();
+            while ($row = mysqli_fetch_assoc($getSubjectQuery)) {
+                $subject_id[] = $row['subject_id'];
+                $subjectData[] = $row;
+            }
+        }
+        $ebook_query = $conn->query("SELECT e_books.id,e_books.title, `Student_Subjects`.`Subject_id`,Subjects.Name AS subject_name FROM e_books LEFT JOIN Student_Subjects ON e_books.Subject_id = Student_Subjects.Subject_id LEFT JOIN Subjects ON Student_Subjects.Subject_id = Subjects.id  WHERE Student_Subjects.Student_ID=" . $_SESSION['ID'] . " AND e_books.subject_id IN ('" . implode("','", $subject_id) . "') AND e_books.Status=1");
+        $eBookData = array();
+        while ($row = mysqli_fetch_assoc($ebook_query)) {
+            $eBookData[] = $row;
+        }
+        $video_query = $conn->query("SELECT video_lectures.id, `Student_Subjects`.`Subject_id`,Subjects.Name AS subject_name, video_lectures.unit, video_lectures.video_url FROM video_lectures LEFT JOIN Student_Subjects ON video_lectures.Subject_id = Student_Subjects.Subject_id LEFT JOIN Subjects ON Student_Subjects.Subject_id = Subjects.id  WHERE Student_Subjects.Student_ID=" . $_SESSION['ID'] . " AND video_lectures.subject_id IN ('" . implode("','", $subject_id) . "') AND video_lectures.Status=1");
+        $videoData = array();
+        while ($row = mysqli_fetch_assoc($video_query)) {
+            $videoData[] = $row;
+        }
+      
+        $question_bank_query = $conn->query("SELECT question_banks.id,question_banks.title, `Student_Subjects`.`Subject_id`,Subjects.Name AS subject_name FROM question_banks LEFT JOIN Student_Subjects ON question_banks.Subject_id = Student_Subjects.Subject_id LEFT JOIN Subjects ON Student_Subjects.Subject_id = Subjects.id  WHERE Student_Subjects.Student_ID=" . $_SESSION['ID'] . " AND question_banks.subject_id IN ('" . implode("','", $subject_id) . "') AND question_banks.Status=1");
+        $question_bankData = array();
+        while ($row = mysqli_fetch_assoc($question_bank_query)) {
+            $question_bankData[] = $row;
+        }
+      
+        // echo "<pre>"; print_r($videoData);die;
+        ?>
+        <div class="content">
+            <div class="card">
+                <div class="card-header p-0">
+                    <ul class="nav nav-tabs nav-fill customtab2" role="tablist">
+                        <li class="nav-item"> <a class="nav-link py-3 <?php echo (!isset($_GET['type']) || $_GET['type'] == '' || $_GET['type'] == 1) ? 'active' : ''; ?>" data-toggle="tab" href="#ebook" role="tab"><span class="hidden-sm-up"><i class="ti-agenda mr-2 h6"></i></span> <span class="h6 hidden-xs-down">Ebooks</span></a></li>
+                        <li class="nav-item"> <a class="nav-link py-3 <?php echo isset($_GET['type']) && $_GET['type'] == 2 ? 'active' : ''; ?>" data-toggle="tab" href="#video" role="tab"><span class="hidden-sm-up"><i class=" ti-video-clapper mr-2 h6"></i></span> <span class="h6 hidden-xs-down">Videos</span></a> </li>
+                        <li class="nav-item"> <a class="nav-link py-3 <?php echo isset($_GET['type']) && $_GET['type'] == 4 ? 'active' : ''; ?>" data-toggle="tab" href="#notes" role="tab"><span class="hidden-sm-up"><i class="ti-write mr-2 h6"></i></span> <span class="h6 hidden-xs-down">Question Banks</span></a> </li>
+                        <li class="nav-item"> <a class="nav-link py-3 <?php echo isset($_GET['type']) && $_GET['type'] == 3 ? 'active' : ''; ?>" data-toggle="tab" href="#subject" role="tab"><span class="hidden-sm-up"><i class="ti-write mr-2 h6"></i></span> <span class="h6 hidden-xs-down">Assessment</span></a> </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content tabcontent-border">
+                        <div class="tab-pane <?php echo (!isset($_GET['type']) || $_GET['type'] == '' || $_GET['type'] == 1) ? 'active' : ''; ?>" id="ebook" role="tabpanel">
+                            <div class="pad-20">
+                                <div class="row">
+                                    <?php if (count($eBookData) > 0) {
+                                        foreach ($eBookData as $eBook) {  ?>
+                                            <div class="col-sm-6 col-md-3 mb-3 ">
+                                                <div class="card info-box p-0">
+                                                    <div class="stu-e-book-style">
+                                                        <p class="picon"><i class="icon-book-open e-book-icon"></i></p>
+                                                        <p class="subject_name"><span><?php echo isset($eBook['title']) ? $eBook['title'] : $eBook['subject_name']; ?></span></p>
+                                                    </div>
+                                                </div>
+                                                <p class="mt-2 " style="text-align:center;"><a class="btn btn-dark" href="/student/lms/view-e-book?id=<?php echo $eBook['id']; ?>&sub_id=<?= $ids ?>">View</a></p>
+                                            </div>
+                                        <?php }
+                                    } else { ?>
+                                        <div class="col-md-12" id="student_e_books_not">
+                                            <p class="text-center">No EBook Found !</p>
+                                        </div>
+                                    <?php }  ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane p-20 <?php echo isset($_GET['type']) && $_GET['type'] == 4 ? 'active' : ''; ?>" id="notes" role="tabpanel">
+                            <div class="pad-20">
+                                <div class="row">
+                                    <?php if (count($question_bankData) > 0) {
+                                        foreach ($question_bankData as $question_bank) {  ?>
+                                            <div class="col-sm-6 col-md-3 mb-3 ">
+                                                <div class="card info-box p-0">
+                                                    <div class="stu-e-book-style">
+                                                        <p class="picon"><i class="icon-book-open e-book-icon"></i></p>
+                                                        <p class="subject_name"><span><?php echo isset($question_bank['title']) ? $question_bank['title'] : $question_bank['subject_name']; ?></span></p>
+                                                    </div>
+                                                </div>
+                                                <p class="mt-2 " style="text-align:center;"><a class="btn btn-dark" href="/student/lms/view-question-bank?id=<?php echo $question_bank['id']; ?>&sub_id=<?= $ids ?>">View</a></p>
+                                            </div>
+                                        <?php }
+                                    } else { ?>
+                                        <div class="col-md-12" id="student_e_books_not">
+                                            <p class="text-center">No Question Bank Found !</p>
+                                        </div>
+                                    <?php }  ?>
+                                </div>
+                            </div>
+                            
+                        
+                        </div>
+                        <div class="tab-pane p-20<?php echo isset($_GET['type']) && $_GET['type'] == 3 ? 'active' : ''; ?>" id="subject" role="tabpanel">
+                            <div class="">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <p class="text-center no_record">Coming Soon... </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="tab-pane p-20 <?php echo isset($_GET['type']) && $_GET['type'] == 2 ? 'active' : ''; ?>" id="video" role="tabpanel">
+                            <div class="row">
+                                <?php if ($video_query->num_rows > 0) { ?>
+                                    <div class="video_box">
+                                        <?php
+                                        foreach ($videoData as $key => $value) {
+                                            $video_url = $value['video_url'];
+                                            $base_url = '';
+                                            if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) {
+                                                if (strpos($video_url, 'youtube.com') !== false) {
+                                                    parse_str(parse_url($video_url, PHP_URL_QUERY), $query_params);
+                                                    $video_id = $query_params['v'];
+                                                } else {
+                                                    $video_id = substr(parse_url($video_url, PHP_URL_PATH), 1);
+                                                }
+                                                $embed_url = 'https://www.youtube.com/embed/' . $video_id;
+                                            } else {
+                                                $embed_url = $base_url . $video_url;
+                                            }
+                                        ?>
+                                            <?php if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) { ?>
+                                                <iframe width="760" height="350" src="<?= $embed_url ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                            <?php } else { ?>
+                                                <video width="760" height="350" controls autoplay controlsList="nodownload" src="<?= $embed_url ?>" type="video/mp4"></video>
+                                            <?php } ?>
+                                        <?php } ?>
+                                    </div>
+                                <?php } ?>
+                                <div class="col-sm-4">
+                                    <?php if (!empty($value['subject_name']) && !empty($value['unit']) && !empty($value['description'])) { ?>
+                                        <h5 class="mt-2 mb-1"><b><?= ucwords($value['subject_name']) ?> :</b> <?= ucwords($value['unit']) ?></h5>
+                                        <p class="video-description"><?= ucfirst($value['description']) ?></p>
+                                    <?php } ?>
+                                    <input type="checkbox" id="video<?= $key ?>" name="video" value="<?= $value['id'] ?>" onclick="getDataFunc('<?= $value['id'] ?>', '<?= $value['video_url'] ?>'); uncheckOthers(this)">
+                                    <a href="#video<?= $key ?>" class="active_<?= $value['id'] ?> list-group-item list-group-item-action flex-column align-items-start">
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <div>
+                                                <input type="hidden" id="video_url_<?= $value['id'] ?>" name="video_url" value="<?= $value['video_url'] ?>">
+                                                <h5 class="mb-0"><?= ucwords($value['subject_name']) ?> :</b> <?= ucwords($value['unit']) ?></h5>
+                                                <small><i class="ti-timer mr-1"></i>45min</small>
+                                            </div>
+                                            <i class="fa fa-play-circle fa-lg"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php include($_SERVER['DOCUMENT_ROOT'] . '/includes/footer-top.php'); ?>
+            <script>
+                $(function() {
+                    if (location.pathname.indexOf('/student/lms/subjects') >= 0) {
+                        $('link[href*="/assets/plugins/bootstrap-switch/bootstrap-switch.css"]').prop('disabled', true);
+                    }
+                });
+                var gradientArray = ['bg-yellow-gradient', 'bg-purple-gradient', 'bg-green-gradient', 'bg-red-gradient', 'bg-aqua-gradient',
+                    'bg-maroon-gradient', 'bg-teal-gradient', 'bg-blue-gradient'
+                ];
+                $(document).ready(function() {
+                    $('.card-img-top').each(function(index) {
+                        $(this).addClass(gradientArray[index % gradientArray.length]);
+                    })
+                    $('.stu-e-book-style').each(function(index) {
+                        $(this).addClass(gradientArray[index % gradientArray.length]);
+                    })
+                    $(".video_box").hide();
+                    $(".video_box").show();
+                    let video_url = $("#video_url_<?= $videoData[0]['id'] ?>").val();
+                    getDataFunc(id = null, "../../" + video_url);
+                });
+
+                function getDataFunc(id, url) {
+                    var videoPlayer = document.getElementById('video_player');
+                    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                        if (url.includes('youtube.com')) {
+                            var videoId = new URL(url).searchParams.get('v');
+                        } else {
+                            var videoId = url.split('/').pop();
+                        }
+                        videoPlayer.outerHTML = '<iframe width="855" height="350" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                    } else {
+                        videoPlayer.src = url;
+                        videoPlayer.load();
+                    }
+                    $(".video_box").show();
+                    $("#video_player").attr('src', "../../" + video_url);
+                    $(".active_" + id + " .list-group-item").addClass('active');
+                    $("#video" + 0).prop('checked', true);
+                    var targetTab = $(this).attr('href');
+                    $(targetTab).addClass('active');
+                }
+
+                function uncheckOthers(checkbox) {
+                    console.log(checkbox);
+                    var checkboxes = document.querySelectorAll('input[type=checkbox][name=video]');
+                    checkboxes.forEach(function(element) {
+                        if (element !== checkbox) {
+                            element.checked = false;
+                        }
+                    });
+                }
+            </script>
+            <?php include($_SERVER['DOCUMENT_ROOT'] . '/includes/footer-bottom.php'); ?>

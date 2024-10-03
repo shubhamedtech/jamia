@@ -1,0 +1,92 @@
+<!-- Modal -->
+<div class="modal-header clearfix text-left">
+  <h5>Upload Assessment</h5>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<form role="form" id="form-upload" foemtarget="_blank" action="/app/e-books/assessments/store" method="POST" enctype="multipart/form-data">
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="col-md-12 text-end cursor-pointer" onclick="window.open('/app/samples/assessments');">
+        <i class="fa fa-file-download-alt"></i><u><span class="text-primary ml-1">Sample</span></u>
+      </div>
+    </div>
+    <?php
+    $unit_id = intval($_GET['unit_id']);
+    $syllabus_id = intval($_GET['syllabus_id']);
+    $ebook_id = intval($_GET['ebook_id']);
+    ?>
+
+    <div class="row">
+      <div class="col-md-12">
+        <input name="unit_id" type="hidden" value="<?= $unit_id ?>" id="unit_id" />
+        <input name="syllabus_id" type="hidden" value="<?= $syllabus_id ?>" id="syllabus_id" />
+        <input name="ebook_id" type="hidden" value="<?= $ebook_id ?>" id="ebook_id" />
+        <input name="file" type="file" accept="application/csv" required/>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer clearfix text-end">
+    <div class="col-md-4 m-t-10 sm-m-t-10">
+      <button aria-label="" type="submit" id="submit-button" class="btn btn-primary btn-cons btn-animated from-left">
+        <i class="fa fa-upload me-2"></i>
+        <span>Upload</span>
+      </button>
+    </div>
+  </div>
+</form>
+
+<script>
+  $(function() {
+    $('#form-upload').validate({
+      rules: {
+        file: {
+          required: true
+        },
+      },
+      highlight: function(element) {
+        $(element).addClass('error');
+        $(element).closest('.form-control').addClass('has-error');
+      },
+      unhighlight: function(element) {
+        $(element).removeClass('error');
+        $(element).closest('.form-control').removeClass('has-error');
+      }
+    });
+  })
+
+  $('#submit-button').click(function() {
+    $('.modal').modal('hide');
+    $('#submit-button').prop('disabled', false);
+    $('#form-upload').submit(function(e) {
+      $('#submit-button').prop('disabled', true);
+      var formData = new FormData(this);
+      // formData.append('inserted_id', localStorage.getItem('inserted_id'));
+      // formData.append('lead_id', '<?php echo isset($_GET['lead_id']) ? $lead_id : 0 ?>');
+      e.preventDefault();
+      $.ajax({
+        url: $(this).attr('action'),
+        type: "POST",
+        data: formData,
+        contentType: false,
+        cache: false,
+        processData: false,
+        dataType: 'json',
+        success: function(data) {
+          if (data.status == 200) {
+            notification('success', data.message);
+            localStorage.setItem('inserted_id', data.id);
+          } else {
+            notification('danger', data.message);
+            $('#previous-button').click();
+          }
+        },
+        error: function(data) {
+          notification('danger', 'Server is not responding. Please try again later');
+          $('#previous-button').click();
+          console.log(data);
+        }
+      });
+    });
+  });
+</script>

@@ -1,0 +1,118 @@
+<?php
+ini_set('display_errors', 1);
+require '../../includes/db-config.php';
+session_start();
+
+if ($_SESSION['Role'] == 'Administrator' || $_SESSION['Role'] == 'Center') {
+
+  $tbl_data = [];
+  $response = [];
+  $where_cnd = "";
+  $draw = $_POST['draw'];
+  $row = $_POST['start'];
+  $rowperpage = $_POST['length'];
+  $searchValue = isset($_POST['search']['value']) ? $_POST['search']['value'] : '';
+  
+  $orderByColumnName = array(
+    'Exam session' => 'Exam_Sessions.Name',
+    'Course Name' => 'Courses.Name',
+    'Paper Name' => 'Subjects.Name',
+    'Exam Date' => 'Date_Sheets.Exam_Date',
+    'Start Time' => 'Date_Sheets.Start_Time',
+    'End Time' => 'Date_Sheets.End_Time'
+  );
+  
+  $orderBy = "Date_Sheets.ID ASC";
+  if (isset($_POST['order'])) {
+      $columnIndex = intval($_POST['order'][0]['column']);
+      $columnName = $_POST['columns'][$columnIndex]['data'];
+      $columnName = $orderByColumnName[$columnName];
+      $columnSortOrder = $_POST['order'][0]['dir'];
+      $orderBy = "$columnName $columnSortOrder";
+  }
+  
+  if (isset($_REQUEST['course_id']) && !empty($_REQUEST['course_id'])) {
+    $course_id = intval($_REQUEST['course_id']);
+    $where_cnd = "WHERE Courses.ID = $course_id";
+  } 
+  
+  if ( isset($_REQUEST['session_id']) && !empty($_REQUEST['session_id'])) {
+    $session_id = intval(($_REQUEST['session_id']));
+    $where_cnd .= (empty($where_cnd)) ? "WHERE Date_Sheets.Exam_Session_ID = $session_id" : " And Date_Sheets.Exam_Session_ID = $session_id";
+  } 
+  
+  $searchQuery = "";
+  if ($searchValue != '') {
+    $likeSearchValue = "%$searchValue%";
+    $searchQuery = (empty($where_cnd)) ? "WHERE Subjects.Name LIKE '$likeSearchValue' " : " AND Subjects.Name LIKE '$likeSearchValue' ";
+  }
+  
+  // Total record without filter
+  $all_count = $conn->query("SELECT COUNT(Date_Sheets.ID) as `totalDateSheet` FROM `Date_Sheets` LEFT JOIN Exam_Sessions ON Exam_Sessions.ID = Date_Sheets.Exam_Session_ID LEFT JOIN Subjects ON Subjects.id = Date_Sheets.Syllabus_ID LEFT JOIN Courses ON Subjects.Program_Grade_ID = Courses.ID");
+  
+  $records = mysqli_fetch_assoc($all_count);
+  $totalRecords = $records['totalDateSheet'];
+  
+  // Total record with filter 
+  $date_sheets = $conn->query("SELECT Exam_Sessions.Name as `Exam session` , Courses.Name as `Course Name` , Subjects.Name as `Paper Name`,Date_Sheets.Exam_Date as `Exam Date` , Date_Sheets.Start_Time as `Start Time`, Date_Sheets.End_Time as `End Time` FROM `Date_Sheets` LEFT JOIN Exam_Sessions ON Exam_Sessions.ID = Date_Sheets.Exam_Session_ID LEFT JOIN Subjects ON Subjects.id = Date_Sheets.Syllabus_ID LEFT JOIN Courses ON Subjects.Program_Grade_ID = Courses.ID $where_cnd $searchQuery ORDER BY $orderBy");
+  
+  $totalRecordwithFilter = $date_sheets->num_rows;
+  
+  if ($totalRecordwithFilter > 0 ) {
+    while( $date_sheet = $date_sheets->fetch_assoc()) {
+      $tbl_data[] = array(
+        "Exam session" => $date_sheet['Exam session'],
+        "Course Name" => $date_sheet['Course Name'],
+        "Paper Name" => $date_sheet['Paper Name'],
+        "Exam Date" => $date_sheet['Exam Date'],
+        "Start Time" => $date_sheet['Start Time'],
+        "End Time" => $date_sheet['End Time'],
+      );
+    }
+  }
+  
+  #Response 
+  $response = array(
+    "draw" => intval($draw),
+    "iTotalRecords" => $totalRecords,
+    "iTotalDisplayRecords" => $totalRecordwithFilter,
+    "aaData" => $tbl_data
+  );
+  
+
+  echo json_encode($response);
+
+} elseif ($_SESSION['Role'] == 'Student') {
+
+  $subjects = $conn->query("SELECT `Subject_id` FROM `Student_Subjects` WHERE `Student_Id` = ". $_SESSION['ID']);
+  $subjects = $subjects->fetch_all();
+  foreach ($subjects as $key => $value) {
+    $subject_list[] = $value[0];
+  }
+  $subject_list = '(' . implode(',',$subject_list) . ')';
+
+  $exam_session = $conn->query('SELECT Admission_Sessions.Exam_Session as `Exam_session` FROM `Students` LEFT JOIN Admission_Sessions ON Admission_Sessions.ID = Students.Admission_Session_ID  WHERE Students.ID = ' . $_SESSION['ID']);
+  $exam_session = $exam_session->fetch_column();
+
+  $datesheet_list = $conn->query("SELECT Exam_Sessions.Name as `Exam session` , Courses.Name as `Course Name` , Subjects.Name as `Paper Name`,Date_Sheets.Exam_Date as `Exam Date` , Date_Sheets.Start_Time as `Start Time`, Date_Sheets.End_Time as `End Time` FROM `Date_Sheets` LEFT JOIN Exam_Sessions ON Exam_Sessions.ID = Date_Sheets.Exam_Session_ID LEFT JOIN Subjects ON Subjects.ID = Date_Sheets.Syllabus_ID LEFT JOIN Courses ON Courses.ID = Subjects.Program_Grade_ID WHERE Subjects.ID IN $subject_list AND Exam_Sessions.Name = '$exam_session'");
+
+  $data = '';
+
+  if ($datesheet_list->num_rows > 0 ) {
+    while( $date_sheet = $datesheet_list->fetch_assoc()) {
+      $row = '<tr>';
+      $row .= '<td>'.$date_sheet['Exam session'].'</td>';
+      $row .= '<td>'.$date_sheet['Course Name'].'</td>';
+      $row .= '<td>'.$date_sheet['Paper Name'].'</td>';
+      $row .= '<td>'.$date_sheet['Exam Date'].'</td>';
+      $row .= '<td>'.$date_sheet['Start Time'].'</td>';
+      $row .= '<td>'.$date_sheet['End Time'].'</td>';
+      $row .= '</tr>';
+      $data .=  $row;
+    }
+  }
+
+  echo $data;
+}
+
+?>
