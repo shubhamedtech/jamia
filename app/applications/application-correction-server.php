@@ -109,12 +109,12 @@ $searchQuery .= $filterByDepartment . $filterQueryUser . $filterByDate . $filter
 
 
 ## Total number of records without filtering
-$all_count = $conn->query("SELECT COUNT(Students.ID) as allcount FROM Students LEFT JOIN Admission_Sessions ON Students.Admission_Session_ID = Admission_Sessions.ID WHERE Students.University_ID = " . $_SESSION['university_id'] . " $role_query $step_query $session_query");
+$all_count = $conn->query("SELECT COUNT(Students.ID) as allcount FROM Students LEFT JOIN Admission_Sessions ON Students.Admission_Session_ID = Admission_Sessions.ID WHERE Students.Admission_Session_ID = 69 and Students.University_ID = " . $_SESSION['university_id'] . " $role_query $step_query $session_query");
 $records = mysqli_fetch_assoc($all_count);
 $totalRecords = $records['allcount'];
 
 ## Total number of record with filtering
-$filter_count = $conn->query("SELECT COUNT(Students.ID) as filtered FROM Students LEFT JOIN Admission_Sessions ON Students.Admission_Session_ID=Admission_Sessions.ID LEFT JOIN Admission_Types ON Students.Admission_Type_ID=Admission_Types.ID LEFT JOIN Sub_Courses ON Students.Sub_Course_ID=Sub_Courses.ID LEFT JOIN Users ON Students.Added_For=Users.ID WHERE Students.University_ID = " . $_SESSION['university_id'] . " $searchQuery $role_query $step_query $session_query");
+$filter_count = $conn->query("SELECT COUNT(Students.ID) as filtered FROM Students LEFT JOIN Admission_Sessions ON Students.Admission_Session_ID=Admission_Sessions.ID LEFT JOIN Admission_Types ON Students.Admission_Type_ID=Admission_Types.ID LEFT JOIN Sub_Courses ON Students.Sub_Course_ID=Sub_Courses.ID LEFT JOIN Users ON Students.Added_For=Users.ID WHERE Students.Admission_Session_ID = 69 and Students.University_ID = " . $_SESSION['university_id'] . " $searchQuery $role_query $step_query $session_query");
 $records = mysqli_fetch_assoc($filter_count);
 $totalRecordwithFilter = $records['filtered'];
 
