@@ -178,6 +178,11 @@ $disallowAccess = array('');
                     </span>
                 </a>
             </li>
+            <li class="">
+                <a href="/lms-settings/application_correction">
+                    <i class="icon-phone"></i> <span>Application Correction</span>
+                </a>
+            </li>
         </ul>
     </div>
 </aside>

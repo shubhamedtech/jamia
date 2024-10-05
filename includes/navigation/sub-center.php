@@ -60,7 +60,7 @@
       <?php
       $pages = $conn->query("SELECT Pages.ID, Pages.Name, Pages.Slug FROM Pages LEFT JOIN Page_Access ON Pages.ID = Page_Access.Page_ID WHERE Pages.`Type` = 'Accounts' GROUP BY Pages.Name");
       if ($pages->num_rows > 0) {
-      ?>
+        ?>
         <li class="treeview <?php print $breadcrumbs[1] == 'accounts' ? 'open active' : '' ?>">
           <a href="#">
             <i class="icon-folder-alt"></i> <span>Accounts</span>
@@ -82,7 +82,7 @@
       <?php
       $pages = $conn->query("SELECT Pages.ID, Pages.Name, Pages.Slug FROM Pages LEFT JOIN Page_Access ON Pages.ID = Page_Access.Page_ID WHERE Pages.`Type` = 'Download' GROUP BY Pages.Name");
       if ($pages->num_rows > 0) {
-      ?>
+        ?>
         <li class="treeview <?php print $breadcrumbs[1] == 'downloads' ? 'open active' : '' ?>">
           <a href="#">
             <i class="ti-save"></i> <span>Download</span>
@@ -100,6 +100,11 @@
           </ul>
         </li>
       <?php } ?>
+      <li class="">
+        <a href="/lms-settings/application_correction">
+          <i class="icon-phone"></i> <span>Application Correction</span>
+        </a>
+      </li>
     </ul>
   </div>
 </aside>

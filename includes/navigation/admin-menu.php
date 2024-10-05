@@ -233,6 +233,9 @@ $disallowAccess = array('');
                     <li class="<?php print $breadcrumbs[2] == 'download_center' ? 'open active' : '' ?>">
                         <a href="/lms-settings/download_center"><i class="fa fa-angle-right"></i>Download Center</a>
                     </li>
+                    <li class="<?php print $breadcrumbs[2] == 'application_correction' ? 'open active' : '' ?>">
+                        <a href="/lms-settings/application_correction"><i class="fa fa-angle-right"></i>Application Correction</a>
+                    </li>
                 </ul>
             </li>
             <!-- <li class="">
