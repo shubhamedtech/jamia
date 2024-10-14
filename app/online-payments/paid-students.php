@@ -49,7 +49,6 @@
                             include '../../includes/db-config.php';
                             session_start();
                             $ids = $_GET['ids'];
-
                             $type = isset($_GET['type']) ? $_GET['type'] : '';
                             if (isset($type) && $type == "3") {
                                 $students = $conn->query("SELECT Students.ID, CONCAT(TRIM(CONCAT(Students.First_Name, ' ', Students.Middle_Name, ' ', Students.Last_Name)), ' (', IF(Students.Unique_ID='' OR Students.Unique_ID IS NULL, RIGHT(CONCAT('000000', Students.ID), 6), Students.Unique_ID), ')') as Student_Name , Students.ID as std_ID, Wallet_Invoices.Amount as amounts, Wallet_Invoices.Invoice_No as transaction_id, Users.Name as center_name, Students.Course_ID, Students.Sub_Course_ID, Wallet_Invoices.User_ID  FROM Wallet_Invoices LEFT JOIN Students ON Wallet_Invoices.Student_ID = Students.ID LEFT JOIN Users ON Users.ID = Wallet_Invoices.User_ID WHERE Students.ID IN ($ids) AND Students.University_ID = " . $_SESSION['university_id'] . " GROUP BY Students.ID");
@@ -58,6 +57,7 @@
                             }
 
                             $newStr = explode(",", $ids);
+                            $studentsCount = count($newStr);
                             if ($students->num_rows > 0) {
                                 while ($student = mysqli_fetch_assoc($students)) {
                             ?>
@@ -71,9 +71,9 @@
                                         if ($_SESSION['Role'] == "Center" || $_SESSION['Role'] == "Administrator") {
                                             $center_fee_Query = $conn->query("SELECT wp.amount AS Fee FROM `Wallet_Invoices` AS wi LEFT JOIN Wallet_Payments  AS wp on  wi.Invoice_No = wp.Transaction_ID  WHERE  `User_ID` = $userTypeId  AND wi.Student_ID = '" . $student['ID'] . "'  AND wi.University_ID=" . $_SESSION['university_id'] . "");
                                             $centerArr = $center_fee_Query->fetch_assoc(); ?>
-                                            <td><?= "&#8377; " . number_format($centerArr['Fee'], 2); ?></td>
+                                            <td><?= "&#8377; " . number_format($centerArr['Fee']/$studentsCount , 2); ?></td>
                                         <?php } else { ?>
-                                            <td><?= "&#8377; " . number_format($student['amounts'], 2) ?></td>
+                                            <td><?= "&#8377; " . number_format($student['amounts']/$studentsCount , 2) ?></td>
                                         <?php } ?>
                                         <td><?= $student['transaction_id'] ?></td>
                                         <td><?= $student['center_name'] ?></td>
