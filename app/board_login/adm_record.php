@@ -23,8 +23,13 @@ if ($result->num_rows > 0) {
     echo "Student not found.";
     exit();
 }
+$answersheetUrl = "https://jua.exam-portal.in/api/answer-sheets/list?uniqueId=$student_id";
+$student_answer_sheet = file_get_contents($answersheetUrl);
+$answer_sheet_data = json_decode($student_answer_sheet,true);
+
 ?>
 
+  
 <!DOCTYPE html>
 <html lang="en">
 
@@ -49,13 +54,45 @@ if ($result->num_rows > 0) {
                 <tbody>
                     <tr>
                         <td>1</td>
-                        <td>Admit Card for <?= htmlspecialchars($student['First_Name'] . " " . $student['Last_Name']); ?></td>
+                        <td><?= htmlspecialchars($student['First_Name'] . " " . $student['Last_Name']); ?></td>
                         <td>
-                            <a href="/app/board_login/admit_card.php?student_id=<?= base64_encode($student['ID']); ?>" class="btn btn-primary">
-                                Download
+                            <a href="/app/board_login/admit_card.php?student_id=<?= base64_encode($student['ID']); ?>" class="">
+                            <i class="fa fa-download fa-lg"></i>
                             </a>
                         </td>
                     </tr>
+                </tbody>
+            </table>
+            <h4>Answer Sheet</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th >#</th>
+                        <th>Subject Name</th>
+                        <th>Date</th>
+                        <th>Download Answer Sheet</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        if(!empty($answer_sheet_data['data']))
+                        {
+                            foreach($answer_sheet_data['data'] as $key=>$value)
+                            {
+                                $pdf_name = str_replace('/','_',$student['Enrollment_No']).'_'.str_replace(' ','_',$value['AssessmentName']).'.pdf';
+                                ?>
+                                    <tr>
+                                        <td><?=$key+1?></td>
+                                        <td><?=$value['AssessmentName']?></td>
+                                        <td><?=$value['StartDate']?></td>
+                                        <td>
+                                            <a href="https://jua.exam-portal.in/api/answer-sheets/pdf?fileName=<?=$pdf_name?>&answerSheetId=<?=$value['AnswerSheetId']?>" Download><i class="fa fa-download fa-lg"></i></a>    
+                                        </td>
+                                    </tr>
+                                <?php
+                            }
+                        }
+                    ?>
                 </tbody>
             </table>
         </div>

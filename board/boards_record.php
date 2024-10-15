@@ -51,9 +51,10 @@
                                 <button class="btn btn-success" onclick="getTable()">Search</button>
                             </div>
 
-                            <div class="row" id="records"></div>
+                            
                             <div class="clearfix"></div>
                         </div>
+                        <div class="row" id="records"></div>
                     </div>
                 <?php } ?>
                 </div>
