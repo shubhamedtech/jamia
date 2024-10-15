@@ -79,7 +79,7 @@
                   <select class="form-control" data-init-plugin="select2" id="departments" onchange="addFilter(this.value, 'departments');">
                     <option value="">Choose Types</option>
                     <?php //$departments = $conn->query("SELECT ID, Name FROM Course_Types WHERE University_ID = " . $_SESSION['university_id']);
-                         $departments = $conn->query("SELECT ID, Name FROM Departments WHERE University_ID = " . $_SESSION['university_id']);
+                    $departments = $conn->query("SELECT ID, Name FROM Departments WHERE University_ID = " . $_SESSION['university_id']);
 
                     while ($department = $departments->fetch_assoc()) {
                       echo '<option value="' . $department['ID'] . '">' . $department['Name'] . '</option>';
@@ -134,28 +134,28 @@
                     </select>
                   </div>
                 </div>
-            <!-- </div>
+                <!-- </div>
             <div class="d-flex justify-content-start"> -->
-              <div class="col-md-2 m-b-10">
-                <div class="form-group">
-                  <select class="form-control sub_center" data-init-plugin="select2" id="sub_center" onchange="addSubCenterFilter(this.value, 'users','subcenter')" data-placeholder="Choose Sub Center">
-                  </select>
+                <div class="col-md-2 m-b-10">
+                  <div class="form-group">
+                    <select class="form-control sub_center" data-init-plugin="select2" id="sub_center" onchange="addSubCenterFilter(this.value, 'users','subcenter')" data-placeholder="Choose Sub Center">
+                    </select>
+                  </div>
                 </div>
-              </div>
             </div>
           <?php } ?>
           <?php if ($_SESSION['CanCreateSubCenter'] == "1" && $_SESSION['Role'] == "Center") { ?>
             <div class="col-md-2 m-b-10">
-                <div class="form-group">
-                  <select class="form-control sub_center" data-init-plugin="select2" id="center_sub_center" onchange="addSubCenterFilter(this.value, 'users')" data-placeholder="Choose Sub Center">
-                  <?php  $sub_center_query = $conn->query("SELECT Users.ID, Users.Name, Users.Code FROM Center_SubCenter LEFT JOIN Users ON Users.ID = Center_SubCenter.Sub_Center  WHERE Center_SubCenter.Center='".$_SESSION['ID']."' AND Users.Role='Sub-Center'");
-                    while($subCenterArr = $sub_center_query->fetch_assoc()){ ?>
+              <div class="form-group">
+                <select class="form-control sub_center" data-init-plugin="select2" id="center_sub_center" onchange="addSubCenterFilter(this.value, 'users')" data-placeholder="Choose Sub Center">
+                  <?php $sub_center_query = $conn->query("SELECT Users.ID, Users.Name, Users.Code FROM Center_SubCenter LEFT JOIN Users ON Users.ID = Center_SubCenter.Sub_Center  WHERE Center_SubCenter.Center='" . $_SESSION['ID'] . "' AND Users.Role='Sub-Center'");
+                  while ($subCenterArr = $sub_center_query->fetch_assoc()) { ?>
                     <option value="">Choose Sub Center</option>
-                    <option value="<?= $subCenterArr['ID'] ?>"><?= $subCenterArr['Name']."(".$subCenterArr['Code'].")"  ?></option>
-                  <?php } ?>  
+                    <option value="<?= $subCenterArr['ID'] ?>"><?= $subCenterArr['Name'] . "(" . $subCenterArr['Code'] . ")"  ?></option>
+                  <?php } ?>
                 </select>
-                </div>
               </div>
+            </div>
           <?php } ?>
 
           <div class="clearfix"></div>
@@ -413,12 +413,9 @@
             "render": function(data, type, row) {
               //var edit = showInhouse || row.Step < 4 ? '<a href="/admissions/application-form?id=' + data + '"><i class="fa fa-edit mr-1 text-warning" title="Edit Application Form"></i></a>' : '';
               var edit = '';
-              if (role == 'Administrator') 
-              {
+              if (role == 'Administrator') {
                 edit = '<a href="/admissions/application-form?id=' + data + '"><i class="fa fa-edit mr-1 text-warning" title="Edit Application Form"></i></a>';
-              }
-               else
-              {
+              } else {
                 edit = (row.Process_By_Center == '1' && (showInhouse || row.Step < 4)) ?
                   '<a href="/admissions/application-form?id=' + data + '"><i class="fa fa-edit mr-1 text-warning" title="Edit Application Form"></i></a>' : '';
               }
@@ -549,7 +546,7 @@
             data: "form_status",
             "render": function(data, type, row) {
               var abc = '<i class="fa fa-edit ml-2 cursor-pointer" title="Add Form Status" onclick="addFormStatus(\'' + row.ID + '\')"></i>';
-              var retuenValue = role=='Administrator'?data + abc:data;
+              var retuenValue = role == 'Administrator' ? data + abc : data;
               return retuenValue;
             },
             visible: (role != 'Sub-Center' && role != 'Center')
@@ -832,7 +829,7 @@
             data: "form_status",
             "render": function(data, type, row) {
               var abc = '<i class="fa fa-edit ml-2 cursor-pointer" title="Add Form Status" onclick="addFormStatus(\'' + row.ID + '\')"></i>';
-              var retuenValue = role=='Administrator'?data + abc:data;
+              var retuenValue = role == 'Administrator' ? data + abc : data;
               return retuenValue;
             },
             visible: (role != 'Sub-Center' && role != 'Center')
@@ -1080,11 +1077,11 @@
             },
             visible: role == 'Sub-Center' ? false : true
           },
-			{
+          {
             data: "form_status",
             "render": function(data, type, row) {
               var abc = '<i class="fa fa-edit ml-2 cursor-pointer" title="Add Form Status" onclick="addFormStatus(\'' + row.ID + '\')"></i>';
-              var retuenValue = role=='Administrator'?data + abc:data;
+              var retuenValue = role == 'Administrator' ? data + abc : data;
               return retuenValue;
             },
             visible: (role != 'Sub-Center' && role != 'Center')
@@ -1335,7 +1332,7 @@
             data: "form_status",
             "render": function(data, type, row) {
               var abc = '<i class="fa fa-edit ml-2 cursor-pointer" title="Add Form Status" onclick="addFormStatus(\'' + row.ID + '\')"></i>';
-              var retuenValue = role=='Administrator'?data + abc:data;
+              var retuenValue = role == 'Administrator' ? data + abc : data;
               return retuenValue;
             },
             visible: (role != 'Sub-Center' && role != 'Center')
@@ -1582,11 +1579,11 @@
             },
             visible: role == 'Sub-Center' ? false : true
           },
-		  {
+          {
             data: "form_status",
             "render": function(data, type, row) {
               var abc = '<i class="fa fa-edit ml-2 cursor-pointer" title="Add Form Status" onclick="addFormStatus(\'' + row.ID + '\')"></i>';
-              var retuenValue = role=='Administrator'?data + abc:data;
+              var retuenValue = role == 'Administrator' ? data + abc : data;
               return retuenValue;
             },
             visible: (role != 'Sub-Center' && role != 'Center')
@@ -1833,11 +1830,11 @@
             },
             visible: role == 'Sub-Center' ? false : true
           },
-			{
+          {
             data: "form_status",
             "render": function(data, type, row) {
               var abc = '<i class="fa fa-edit ml-2 cursor-pointer" title="Add Form Status" onclick="addFormStatus(\'' + row.ID + '\')"></i>';
-              var retuenValue = role=='Administrator'?data + abc:data;
+              var retuenValue = role == 'Administrator' ? data + abc : data;
               return retuenValue;
             },
             visible: (role != 'Sub-Center' && role != 'Center')
@@ -1870,8 +1867,8 @@
       $('#application-search-table').keyup(function() {
         applicationTable.fnFilter($(this).val());
       });
-   
-      
+
+
       $('#not-processed-search-table').keyup(function() {
         notProcessedTable.fnFilter($(this).val());
       });
@@ -1990,12 +1987,12 @@
 
   <script type="text/javascript">
     function exportData() {
-      
+
       var search = $('#application-search-table').val();
       var steps_found = $('.nav-tabs').find('li a.active').attr('data-target');
       steps_found = steps_found.substring(1, steps_found.length);
       var url = search.length > 0 ? "?steps_found=" + steps_found + "&search=" + search : "?steps_found=" + steps_found;
-      console.log(url,"url");
+      console.log(url, "url");
       //var url = search.length > 0 ? "?search=" + search : "";
       //window.open('/app/applications/export' + url);
 
@@ -2181,19 +2178,19 @@
       })
     }
   </script>
-<script>
-  $(document).ready(function(){
-     var center_id = '<?= $_SESSION['ID'] ?>';
-     var role = '<?= $_SESSION['Role'] ?>';
-  })
-</script>
+  <script>
+    $(document).ready(function() {
+      var center_id = '<?= $_SESSION['ID'] ?>';
+      var role = '<?= $_SESSION['Role'] ?>';
+    })
+  </script>
   <script>
     $("#users").select2({
       placeholder: 'Choose Center'
     })
 
     $("#verticals").select2({
-      placeholder:"Choose verticals"
+      placeholder: "Choose verticals"
     })
 
     $("#departments").select2({
@@ -2216,12 +2213,12 @@
     $("#sub_center").select2({
       placeholder: 'Choose Sub Center'
     })
-    
 
-    function addFilter(id, by, role=null) {
-      console.log(id,'id');
-      console.log(by,'by');
-      console.log(role,'role');
+
+    function addFilter(id, by, role = null) {
+      console.log(id, 'id');
+      console.log(by, 'by');
+      console.log(role, 'role');
       $.ajax({
         url: '/app/applications/filter',
         type: 'POST',
@@ -2235,37 +2232,42 @@
           console.log(data);
           if (data.status) {
             $('.table').DataTable().ajax.reload(null, false);
-              if('<?= $_SESSION['Role'] ?>'==='Administrator'){
-                $(".sub_center").html(data.subCenterName);
-              } 
+            if ('<?= $_SESSION['Role'] ?>' === 'Administrator') {
+              $(".sub_center").html(data.subCenterName);
+            }
             //$(".sub_center").html(data.subCenterName);
           }
         }
       })
     }
 
-    function addCenterFilter(id, by, role=null) {
-      console.log(id,'id');
-      console.log(by,'by');
-      console.log(role,'role');
+    function addCenterFilter(id, by, role = null) {
+      console.log(id, 'id');
+      console.log(by, 'by');
+      console.log(role, 'role');
       $.ajax({
         url: '/app/applications/filter',
         type: 'POST',
-        data: { id, by, role },
+        data: {
+          id,
+          by,
+          role
+        },
         dataType: 'json',
         success: function(data) {
           console.log(data);
           if (data.status) {
             $('.table').DataTable().ajax.reload(null, false);
-            if('<?= $_SESSION['Role'] ?>'==='Administrator'){
+            if ('<?= $_SESSION['Role'] ?>' === 'Administrator') {
               $("#users").html(data.centerName);
+              $("#sub_center").html('');
             }
           }
         }
       })
     }
-    
-    function addSubCenterFilter(id, by, role=null) {
+
+    function addSubCenterFilter(id, by, role = null) {
       $.ajax({
         url: '/app/applications/filter',
         type: 'POST',
@@ -2285,7 +2287,7 @@
 
     function addDateFilter() {
       var startDate = $("#startDateFilter").val();
-      var endDate   = $("#endDateFilter").val();
+      var endDate = $("#endDateFilter").val();
       if (startDate.length == 0 || endDate == 0) {
         return
       }
@@ -2322,7 +2324,7 @@
       })
     }
   </script>
-	<script>
+  <script>
     function addFormStatus(id) {
       $.ajax({
         url: '/app/applications/formstatus/create?id=' + id,

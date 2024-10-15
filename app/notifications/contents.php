@@ -9,7 +9,6 @@
       <?php
       if (isset($_GET['id'])) {
         $id = $_GET['id'];
-        ## Database configuration
         include '../../includes/db-config.php';
         session_start();
         $content = $conn->query("SELECT * FROM Notifications_Generated WHERE ID = $id");

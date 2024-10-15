@@ -10,7 +10,6 @@
   <div class="content-wrapper">
     <div class="content-header sty-one">
       <div class="d-flex align-items-center justify-content-between">
-
         <?php $breadcrumbs = array_filter(explode("/", $_SERVER['REQUEST_URI']));
         for ($i = 1; $i <= count($breadcrumbs); $i++) {
           if (count($breadcrumbs) == $i) : $active = "active";

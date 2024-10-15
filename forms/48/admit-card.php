@@ -11,7 +11,12 @@ if (isset($_GET['student_id'])) {
     $id = base64_decode($id);
     $id = intval(str_replace('W1Ebt1IhGN3ZOLplom9I', '', $id));
 
-    $student = $conn->query("SELECT Students.*, Users.Name as Center, Users.Code as Center_Code, Users.ID as Center_ID, Users.Photo as Center_Seal, Users.City as Center_City, UPPER(Courses.Name) as Course, Sub_Courses.Name as Sub_Course, Admission_Sessions.Name as `Session`, Admission_Sessions.Exam_Session, Admission_Types.Name as Type FROM Students LEFT JOIN Users ON Students.Added_For = Users.ID LEFT JOIN Courses ON Students.Course_ID = Courses.ID LEFT JOIN Sub_Courses ON Students.Sub_Course_ID = Sub_Courses.ID LEFT JOIN Admission_Sessions ON Students.Admission_Session_ID = Admission_Sessions.ID LEFT JOIN Admission_Types ON Students.Admission_Type_ID = Admission_Types.ID WHERE Students.ID = $id");
+    $student = $conn->query("SELECT Students.*, Users.Name as Center, Users.Code as Center_Code, Users.ID as Center_ID, Users.Photo as Center_Seal, Users.City as Center_City, UPPER(Courses.Name) as Course, Sub_Courses.Name as Sub_Course, Admission_Sessions.Name as `Session`, Admission_Sessions.Exam_Session, Admission_Types.Name as Type FROM Students 
+    LEFT JOIN Users ON Students.Added_For = Users.ID 
+    LEFT JOIN Courses ON Students.Course_ID = Courses.ID 
+    LEFT JOIN Sub_Courses ON Students.Sub_Course_ID = Sub_Courses.ID 
+    LEFT JOIN Admission_Sessions ON Students.Admission_Session_ID = Admission_Sessions.ID 
+    LEFT JOIN Admission_Types ON Students.Admission_Type_ID = Admission_Types.ID WHERE Students.ID = $id");
     $student = mysqli_fetch_assoc($student);
     $address = json_decode($student['Address'], true);
     if (strlen($student['Center_Code']) > 4) {

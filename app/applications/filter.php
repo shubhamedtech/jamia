@@ -3,7 +3,7 @@ if (isset($_POST['id']) && isset($_POST['by'])) {
   session_start();
   require '../../includes/db-config.php';
 
-  $by = $_POST['by'];// courses
+  $by = $_POST['by']; // courses
   $role_type = isset($_POST['role']) ? $_POST['role'] : NULL;
   $id = intval($_POST['id']); // 
 
@@ -32,17 +32,19 @@ if (isset($_POST['id']) && isset($_POST['by'])) {
         $options .= '<option value="' . $center['ID'] . '">' . $center['Name'] . '</option>';
         $ids[] = $center['ID'];
       }
-      $ids_list = "(" . implode(",", $ids) . ")"; 
+      $ids_list = "(" . implode(",", $ids) . ")";
       $_SESSION['filterByVertical'] = " AND Students.Added_For IN $ids_list";
       $center_name = $options;
     }
+    $_SESSION['filterByUser'] = '';
   } elseif ($by == 'users') {
     $user = $conn->query("SELECT Role,CanCreateSubCenter FROM Users WHERE ID = $id");
     $user = $user->fetch_assoc();
-
     $role = $user['Role'];
     $can_create_subcenter = $user['CanCreateSubCenter'];
     $role_query = " AND Students.Added_For = $id";
+    // print_r($role_query);
+    // die();
     if ($role == 'Counsellor') {
       $center_list = array($id);
       $sub_center_list = array();
@@ -119,7 +121,6 @@ if (isset($_POST['id']) && isset($_POST['by'])) {
 
       $subCenter = $conn->query("SELECT * FROM Center_SubCenter WHERE Center=$id");
       if ($subCenter->num_rows > 0 && $can_create_subcenter == 1) {
-        // echo "subcenter"; die;
         $subCenterArrId = array();
         while ($subCenterArr = $subCenter->fetch_assoc()) {
           $subCenterArrId[] = $subCenterArr['Sub_Center'];
@@ -134,19 +135,48 @@ if (isset($_POST['id']) && isset($_POST['by'])) {
         }
         $center_sub_center = $subcenter_ids . ',' . $id;
       } else if ($can_create_subcenter == 0 && $subCenter->num_rows == 0) {
-
         $center_sub_center = $id;
       } else {
-    
         $sub_center_name = "<option value=''>No Record found!</option>";
       }
     } elseif ($role == 'Sub-Center') {
       $role_query = " AND Students.Added_For = $id AND Students.University_ID = " . $_SESSION['university_id'];
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //  $_SESSION['search_id']= $id;
     //  $_SESSION['filterByCenter'] = $center_sub_center;
     if ($role_type == 'center') {
-
       if (!empty($center_sub_center)) {
         $_SESSION['filterByUser'] = " AND Students.Added_For IN ($center_sub_center)";
       } else {
@@ -170,5 +200,5 @@ if (isset($_POST['id']) && isset($_POST['by'])) {
     }
   }
   // echo json_encode(['status' => true]);
-  echo json_encode(['status' => true, 'subCenterName' => $sub_center_name , 'centerName' => $center_name]);
+  echo json_encode(['status' => true, 'subCenterName' => $sub_center_name, 'centerName' => $center_name]);
 }

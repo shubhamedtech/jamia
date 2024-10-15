@@ -59,13 +59,13 @@ $disallowAccess = array('');
                 </ul>
             </li>
             <?php
-             $check = $conn->query("SELECT ID FROM Users WHERE Role = 'Center' AND CanCreateSubCenter=1 AND ID=".$_SESSION['ID']);
-            if($check->num_rows>0){
+            $check = $conn->query("SELECT ID FROM Users WHERE Role = 'Center' AND CanCreateSubCenter=1 AND ID=" . $_SESSION['ID']);
+            if ($check->num_rows > 0) {
                 $none = 'display:block';
-            }else{
+            } else {
                 $none = 'display:none';
             }
-            
+
             $pages = $conn->query("SELECT Pages.ID, Pages.Name, Pages.Slug FROM Pages LEFT JOIN Page_Access ON Pages.ID = Page_Access.Page_ID AND Page_Access.University_ID = " . $_SESSION['university_id'] . " WHERE Pages.`Type` = 'Accounts' AND Page_Access.Inhouse = 1");
             if ($pages->num_rows > 0) {
             ?>
